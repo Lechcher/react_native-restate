@@ -4,7 +4,7 @@ import Search from "@/components/Search";
 import icons from "@/constants/icons";
 import { useGlobalContext } from "@/core/global-provider";
 import { Redirect, useRouter } from "expo-router";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const caculateTimeBasedGreeting = () => {
@@ -28,7 +28,7 @@ export default function Index() {
 
   return (
     <SafeAreaView className="bg-white h-full">
-      <View className="px-5">
+      <View className="px-5 pb-2">
         <View className="flex flex-row items-center justify-between">
           <View className="flex flex-row items-center">
             <TouchableOpacity onPress={() => router.push("/profile")}>
@@ -37,57 +37,67 @@ export default function Index() {
                 className="size-12 rounded-full"
               />
             </TouchableOpacity>
-
             <View className="flex flex-col items-start ml-2">
               <Text className="text-xs font-rubik text-black-100">{`${caculateTimeBasedGreeting()}`}</Text>
               <Text className="text-base font-rubik-medium text-black-300">{`${user?.name}`}</Text>
             </View>
           </View>
-
           <Image source={icons.bell} className="size-6" />
         </View>
 
         <Search />
-
-        <View className="py-5">
-          <View className="flex flex-row items-center justify-between">
-            <Text className="text-xl font-rubik-bold text-black-300">
-              Featured
-            </Text>
-            <TouchableOpacity>
-              <Text className="text-base font-rubik-bold text-primary-300">
-                See All
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View className="flex flex-row gap-5">
-          <FeaturedCard />
-          <FeaturedCard />
-          <FeaturedCard />
-        </View>
-
-        <View className="py-5">
-          <View className="flex flex-row items-center justify-between">
-            <Text className="text-xl font-rubik-bold text-black-300">
-              Our Recommendation
-            </Text>
-            <TouchableOpacity>
-              <Text className="text-base font-rubik-bold text-primary-300">
-                See All
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <Filter />
-
-        <View className="flex flex-row gap-5">
-          <Card />
-          <Card />
-        </View>
       </View>
+
+      <FlatList
+        data={[1, 2, 3, 4]}
+        renderItem={({ item }) => <Card />}
+        keyExtractor={(item) => item.toString()}
+        numColumns={2}
+        contentContainerClassName="pb-32 px-5"
+        columnWrapperClassName="flex gap-5"
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <View>
+            <View className="py-5">
+              <View className="flex flex-row items-center justify-between">
+                <Text className="text-xl font-rubik-bold text-black-300">
+                  Featured
+                </Text>
+
+                <TouchableOpacity>
+                  <Text className="text-base font-rubik-bold text-primary-300">
+                    See All
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <FlatList
+                data={[1, 2, 3, 4]}
+                renderItem={({ item }) => <FeaturedCard />}
+                keyExtractor={(item) => item.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerClassName="flex gap-5 mt-5"
+                bounces={false}
+              />
+            </View>
+            <View className="py-5">
+              <View className="flex flex-row items-center justify-between">
+                <Text className="text-xl font-rubik-bold text-black-300">
+                  Our Recommendation
+                </Text>
+
+                <TouchableOpacity>
+                  <Text className="text-base font-rubik-bold text-primary-300">
+                    See All
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <Filter />
+          </View>
+        }
+      />
     </SafeAreaView>
   );
 }
