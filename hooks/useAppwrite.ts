@@ -52,6 +52,9 @@ export const useAppwrite = <T, P extends Record<string, string | number>>({
   }, []);
 
   const refetch = async (newParams: P) => await fetchData(newParams);
+  // Ensure refetch has a stable identity to avoid infinite effect loops
+  // when used in dependency arrays.
+  const stableRefetch = useCallback((newParams: P) => fetchData(newParams), [fetchData]);
 
-  return { data, loading, error, refetch };
+  return { data, loading, error, refetch: stableRefetch };
 };

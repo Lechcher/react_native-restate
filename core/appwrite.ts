@@ -191,28 +191,30 @@ export const getProperties = async ({
   query,
   limit,
 }: {
-  filter: string;
-  query: string;
-  limit: number;
+  filter?: string;
+  query?: string;
+  limit?: number;
 }) => {
   try {
     const buildQuery = [Query.orderDesc("$createdAt")];
 
-    if (filter && filter !== "all") {
-      buildQuery.push(Query.equal("type", filter));
+    const normalizedFilter = filter?.trim();
+    if (normalizedFilter && normalizedFilter.toLowerCase() !== "all") {
+      buildQuery.push(Query.equal("type", normalizedFilter));
     }
 
-    if (query) {
+    const normalizedQuery = query?.trim();
+    if (normalizedQuery) {
       buildQuery.push(
         Query.or([
-          Query.search("name", query),
-          Query.search("address", query),
-          Query.search("type", query),
+          Query.search("name", normalizedQuery),
+          Query.search("address", normalizedQuery),
+          Query.search("type", normalizedQuery),
         ])
       );
     }
 
-    if (limit) {
+    if (typeof limit === "number" && limit > 0) {
       buildQuery.push(Query.limit(limit));
     }
 
