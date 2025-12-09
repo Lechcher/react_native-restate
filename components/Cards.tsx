@@ -1,18 +1,21 @@
-import icons from "@/constants/icons";
-import images from "@/constants/images";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
+import icons from "@/constants/icons";
+import images from "@/constants/images";
+import type { Models } from "react-native-appwrite";
+
 interface CardProps {
+  item: Models.Row & any;
   onPress?: () => void;
 }
 
-const FeaturedCard = ({ onPress }: CardProps) => {
+const FeaturedCard = ({ item, onPress }: CardProps) => {
   return (
     <TouchableOpacity
       onPress={onPress}
       className="flex flex-col items-center w-60 h-80 relative"
     >
-      <Image source={images.japan} className="size-full rounded-2xl" />
+      <Image source={{ uri: item.image }} className="size-full rounded-2xl" />
       <Image
         source={images.cardGradient}
         className="size-full rounded-2xl absolute bottom-0"
@@ -22,7 +25,7 @@ const FeaturedCard = ({ onPress }: CardProps) => {
         <Image source={icons.star} className="size-3.5" />
 
         <Text className="text-xs font-rubik-bold text-primary-300 ml-1">
-          4.4
+          {item.rating}
         </Text>
       </View>
 
@@ -31,14 +34,14 @@ const FeaturedCard = ({ onPress }: CardProps) => {
           className="text-xl font-rubik-extrabold text-white"
           numberOfLines={1}
         >
-          Modern Apartment
+          {item.name}
         </Text>
 
-        <Text className="text-base font-rubik text-white">New York, US</Text>
+        <Text className="text-base font-rubik text-white">{item.address}</Text>
 
         <View className="flex flex-row items-center justify-between w-full">
           <Text className="text-xl font-rubik-extrabold text-white">
-            $12,219
+            ${item.price}
           </Text>
 
           <Image source={icons.heart} className="size-5" />
@@ -48,7 +51,7 @@ const FeaturedCard = ({ onPress }: CardProps) => {
   );
 };
 
-const Card = ({ onPress }: CardProps) => {
+const Card = ({ item, onPress }: CardProps) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -62,18 +65,20 @@ const Card = ({ onPress }: CardProps) => {
         </Text>
       </View>
 
-      <Image source={images.newYork} className="w-full h-40 rounded-lg" />
+      <Image source={{ uri: item.image }} className="w-full h-40 rounded-lg" />
 
       <View className="flex flex-col mt-2">
         <Text className="text-xl font-rubik-bold text-black-300">
-          Modern Apartment
+          {item.name}
         </Text>
 
-        <Text className="text-xs font-rubik text-black-200">New York, US</Text>
+        <Text className="text-xs font-rubik text-black-200">
+          {item.address}
+        </Text>
 
         <View className="flex flex-row items-center justify-between mt-2">
           <Text className="text-base font-rubik-bold text-primary-300">
-            $12,219
+            ${item.price}
           </Text>
 
           <Image

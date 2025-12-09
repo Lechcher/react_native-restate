@@ -1,8 +1,9 @@
-import icons from "@/constants/icons";
-import { router, useLocalSearchParams, usePathname } from "expo-router";
-import { useState } from "react";
 import { Image, TextInput, TouchableOpacity, View } from "react-native";
+import { router, useLocalSearchParams, usePathname } from "expo-router";
+
+import icons from "@/constants/icons";
 import { useDebouncedCallback } from "use-debounce";
+import { useState } from "react";
 
 const Search = () => {
   // biome-ignore lint/correctness/noUnusedVariables: Only take the path name for search params

@@ -1,10 +1,21 @@
 import { Card, FeaturedCard } from "@/components/Cards";
 import Filter from "@/components/Filter";
+import NoResults from "@/components/NoResults";
 import Search from "@/components/Search";
 import icons from "@/constants/icons";
+import { getFeaturedProperties, getProperties } from "@/core/appwrite";
 import { useGlobalContext } from "@/core/global-provider";
-import { Redirect, useRouter } from "expo-router";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import { useAppwrite } from "@/hooks/useAppwrite";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const caculateTimeBasedGreeting = () => {
@@ -23,6 +34,42 @@ export default function Index() {
   const { user, loading, isLoggedIn } = useGlobalContext();
 
   const router = useRouter();
+
+  const params = useLocalSearchParams<{ query?: string; filter?: string }>();
+
+  const { data: featuredProperties, loading: featuredPropertiesLoading } =
+    useAppwrite({
+      fn: () => getFeaturedProperties(),
+    });
+
+  const {
+    data: properties,
+    loading: propertiesLoading,
+    refetch,
+  } = useAppwrite({
+    fn: getProperties,
+    params: {
+      // biome-ignore lint/style/noNonNullAssertion: If filter is undefined, fetch all properties
+      filter: params.filter!,
+      // biome-ignore lint/style/noNonNullAssertion: If query is undefined, fetch all properties
+      query: params.query!,
+      limit: 10,
+    },
+    skip: true,
+  });
+
+  useEffect(() => {
+    refetch({
+      // biome-ignore lint/style/noNonNullAssertion: If filter is undefined, fetch all properties
+      filter: params.filter!,
+      // biome-ignore lint/style/noNonNullAssertion: If query is undefined, fetch all properties
+      query: params.query!,
+      limit: 10,
+    });
+  }, [params.filter, params.query, refetch]);
+
+  const handleCardPress = (propertyId: string) =>
+    router.push(`/properties/${propertyId}`);
 
   if (!loading && !isLoggedIn) return <Redirect href={"/auth"} />;
 
@@ -49,13 +96,22 @@ export default function Index() {
       </View>
 
       <FlatList
-        data={[1, 2, 3, 4]}
-        renderItem={({ item }) => <Card />}
-        keyExtractor={(item) => item.toString()}
+        data={properties}
         numColumns={2}
+        renderItem={({ item }) => (
+          <Card item={item} onPress={() => handleCardPress(item.$id)} />
+        )}
+        keyExtractor={(item) => item.$id}
         contentContainerClassName="pb-32 px-5"
         columnWrapperClassName="flex gap-5"
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          propertiesLoading ? (
+            <ActivityIndicator size="large" className="text-primary-300 mt-5" />
+          ) : (
+            <NoResults />
+          )
+        }
         ListHeaderComponent={
           <View>
             <View className="py-5">
@@ -71,15 +127,26 @@ export default function Index() {
                 </TouchableOpacity>
               </View>
 
-              <FlatList
-                data={[1, 2, 3, 4]}
-                renderItem={({ item }) => <FeaturedCard />}
-                keyExtractor={(item) => item.toString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerClassName="flex gap-5 mt-5"
-                bounces={false}
-              />
+              {featuredPropertiesLoading ? (
+                <ActivityIndicator size="large" className="text-primary-300" />
+              ) : !featuredProperties || featuredProperties.length === 0 ? (
+                <NoResults />
+              ) : (
+                <FlatList
+                  data={featuredProperties}
+                  renderItem={({ item }) => (
+                    <FeaturedCard
+                      item={item}
+                      onPress={() => handleCardPress(item.$id)}
+                    />
+                  )}
+                  keyExtractor={(item) => item.$id}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerClassName="flex gap-5 mt-5"
+                  bounces={false}
+                />
+              )}
             </View>
             <View className="py-5">
               <View className="flex flex-row items-center justify-between">
