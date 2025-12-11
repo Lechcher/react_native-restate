@@ -1,3 +1,4 @@
+// Router helpers: navigate back and read dynamic route params
 import { router, useLocalSearchParams } from "expo-router";
 import {
 	Dimensions,
@@ -10,6 +11,7 @@ import {
 	View,
 } from "react-native";
 
+// Local UI components and constants
 import Comment from "@/components/Comment";
 import { facilities } from "@/constants/data";
 import icons from "@/constants/icons";
@@ -18,12 +20,15 @@ import { getPropertyById } from "@/core/appwrite";
 import { useAppwrite } from "@/hooks/useAppwrite";
 
 const Property = () => {
+	// Read property id from the route, e.g., /properties/[id]
 	const { id } = useLocalSearchParams<{ id?: string }>();
 
+	// Compute hero image height based on device window height
 	const windowHeight = Dimensions.get("window").height;
 
 	const propertyImageHeight = windowHeight / 2;
 
+	// Fetch property details by id using Appwrite
 	const { data: property } = useAppwrite({
 		fn: getPropertyById,
 		// biome-ignore lint/style/noNonNullAssertion: propertyId is guaranteed to be defined
@@ -34,10 +39,12 @@ const Property = () => {
 
 	return (
 		<View>
+			{/* Scrollable content: hero, info, agent, overview, facilities, gallery, location, reviews */}
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				contentContainerClassName="pb-32 bg-white"
 			>
+				{/* Top hero image with gradient overlay */}
 				<View
 					className={`relative w-full`}
 					style={{ height: propertyImageHeight }}
@@ -53,6 +60,7 @@ const Property = () => {
 					/>
 				</View>
 
+				{/* Floating header: back, favorite, share */}
 				<View
 					className="z-50 absolute inset-x-7"
 					style={{ top: Platform.OS === "ios" ? 70 : 20 }}
@@ -76,6 +84,7 @@ const Property = () => {
 					</View>
 				</View>
 
+				{/* Basic info: name, type badge, rating, features */}
 				<View className="px-5 mt-7 flex gap-2">
 					<Text className="text-2xl font-rubik-extrabold">
 						{property?.name}
@@ -122,6 +131,7 @@ const Property = () => {
 						</Text>
 					</View>
 
+					{/* Agent section */}
 					<View className="w-full border-t border-primary-200 pt-7 mt-5">
 						<Text className="text-black-300 text-xl font-rubik-bold">
 							Agent
@@ -154,6 +164,7 @@ const Property = () => {
 						</View>
 					</View>
 
+					{/* Overview section */}
 					<View className="mt-7">
 						<Text className="text-black-300 text-xl font-rubik-bold">
 							Overview
@@ -164,6 +175,7 @@ const Property = () => {
 						</Text>
 					</View>
 
+					{/* Facilities section */}
 					<View className="mt-7">
 						<Text className="text-black-300 text-xl font-rubik-bold">
 							Facilities
@@ -202,6 +214,7 @@ const Property = () => {
 						)}
 					</View>
 
+					{/* Gallery section */}
 					{property?.gallery.length > 0 && (
 						<View className="mt-7">
 							<Text className="text-black-300 text-xl font-rubik-bold">
@@ -225,6 +238,7 @@ const Property = () => {
 						</View>
 					)}
 
+					{/* Location and reviews */}
 					<View className="mt-7">
 						<Text className="text-black-300 text-xl font-rubik-bold">
 							Location
@@ -260,6 +274,7 @@ const Property = () => {
 				</View>
 			</ScrollView>
 
+			{/* Bottom price bar and booking CTA */}
 			<View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 p-7">
 				<View className="flex flex-row items-center justify-between gap-10">
 					<Text className="text-black-200 text-xs font-rubik-medium">

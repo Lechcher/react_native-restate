@@ -1,13 +1,18 @@
+// UI components for cards, filters, empty state, and search
 import { Card } from "@/components/Cards";
 import Filter from "@/components/Filter";
 import NoResults from "@/components/NoResults";
 import Search from "@/components/Search";
 import icons from "@/constants/icons";
+
+// Data helpers and global app state
 import { getProperties } from "@/core/appwrite";
 import { useGlobalContext } from "@/core/global-provider";
 import { useAppwrite } from "@/hooks/useAppwrite";
+
+// Router utilities for navigation and reading URL query params
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -19,14 +24,17 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Explore = () => {
+  // Global app loading and auth state
   const { loading, isLoggedIn } = useGlobalContext();
 
-  const [page, setPage] = useState(1);
-
+  // Navigation helper for pushing routes and going back
   const router = useRouter();
 
+  // Read query params from URL: `query` for text search, `filter` for category
   const params = useLocalSearchParams<{ query?: string; filter?: string }>();
 
+  // Properties list state via custom Appwrite hook.
+  // `skip: true` prevents initial fetch; we trigger it in useEffect based on params.
   const {
     data: properties,
     loading: propertiesLoading,
@@ -43,6 +51,7 @@ const Explore = () => {
     skip: true,
   });
 
+  // Refetch whenever `filter` or `query` changes to update the grid results.
   useEffect(() => {
     refetch({
       // biome-ignore lint/style/noNonNullAssertion: If filter is undefined, fetch all properties
@@ -53,11 +62,14 @@ const Explore = () => {
     });
   }, [params.filter, params.query, refetch]);
 
+  // Navigate to property details when a card is pressed
   const handleCardPress = (propertyId: string) =>
     router.push(`/properties/${propertyId}`);
 
+  // If not authenticated after loading, redirect to auth screen
   if (!loading && !isLoggedIn) return <Redirect href={"/auth"} />;
 
+  // UI layout: header (back, title, bell), search + filter, results count, grid list
   return (
     <SafeAreaView className="bg-white h-full">
       <View className="flex flex-row items-center justify-between px-5">

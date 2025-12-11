@@ -1,3 +1,4 @@
+// Core React Native UI primitives
 import {
   Alert,
   Image,
@@ -7,8 +8,11 @@ import {
   View,
 } from "react-native";
 
+// Navigation redirect and safe area wrapper
 import { Redirect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+// Local UI components and constants
 import Separator from "@/components/ui/Separator";
 import SettingsItem from "@/components/SettingsItem";
 import icons from "@/constants/icons";
@@ -17,10 +21,13 @@ import { settings } from "@/constants/data";
 import { useGlobalContext } from "@/core/global-provider";
 
 const Profile = () => {
+  // Global state: user info, loading/auth status, and refetch helper
   const { refetch, user, loading, isLoggedIn } = useGlobalContext();
 
+  // Protect route: redirect unauthenticated users once loading completes
   if (!loading && !isLoggedIn) return <Redirect href={"/auth"} />;
 
+  // Logout handler: calls backend logout and refreshes global state
   const handerLogout = async () => {
     const result = await logout();
 
@@ -34,6 +41,7 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="h-full bg-white">
+      {/* Header: screen title and notifications icon */}
       <View className="flex flex-row items-center justify-between px-7">
         <Text className="text-xl font-rubik-bold">Profile</Text>
         <Image source={icons.bell} className="size-5" />
@@ -43,6 +51,7 @@ const Profile = () => {
         showsVerticalScrollIndicator={false}
         contentContainerClassName="px-7"
       >
+        {/* Profile avatar, edit button, and display name */}
         <View className="flex-row justify-center flex">
           <View className="flex flex-col items-center relative mt-5">
             <Image
@@ -60,6 +69,7 @@ const Profile = () => {
           </View>
         </View>
 
+        {/* Quick settings shortcuts with separators */}
         <View className="flex flex-col mt-5">
           <Separator />
           <SettingsItem icon={icons.calendar} title="My Bookings" />
@@ -67,12 +77,14 @@ const Profile = () => {
           <Separator />
         </View>
 
+        {/* Other settings mapped from constants */}
         <View className="flex flex-col">
           {settings.slice(2).map((item) => (
             <SettingsItem key={item.title} {...item} />
           ))}
         </View>
 
+        {/* Logout action */}
         <View className="flex flex-col">
           <SettingsItem
             icon={icons.logout}
